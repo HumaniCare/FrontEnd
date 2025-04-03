@@ -1,10 +1,13 @@
 import React from "react";
+import { useNavigate } from "react-router-dom";
 import Button from "../components/Button";
 import Logo from "../components/Logo";
 
 const LoginPage = () => {
+    const navigate = useNavigate();
     const handleKakaoLogin = () => {
         //window.location.href = "나중에 카카오 로그인 키. "
+        navigate("/signup");
     };
 
     return (
