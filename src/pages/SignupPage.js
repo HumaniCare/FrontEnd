@@ -1,10 +1,12 @@
 import React from "react";
+import { useNavigate } from "react-router-dom";
 import Button from "../components/Button";
+import Logo from "../components/Logo";
 
 const SignupPage = () => {
     return(
         <div style={styles.container}>
-            <img src="heart.png" alt="heart" style={styles.image} />
+            <Logo />
             <h2 style={styles.title}>회원 정보 입력</h2>
 
             <input style={styles.input} placeholder="보호자 이름을 입력하세요."/>
