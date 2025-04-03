@@ -4,6 +4,7 @@ import Button from "../components/Button";
 import Logo from "../components/Logo";
 
 const SignupPage = () => {
+    const navigate = useNavigate();
     return(
         <div style={styles.container}>
             <Logo />
@@ -14,7 +15,7 @@ const SignupPage = () => {
             <input style={styles.input} placeholder="피보호자 이름을 입력하세요."/>
             <input style={styles.input} placeholder="피보호자 생일을 6글자로 입력하세요."/>
 
-            <Button text="넘어가기" color="#DABEC9" />
+            <Button text="넘어가기" color="#DABEC9" onClick={() => navigate("/voice-training")} />
         </div>
     );
 };
