@@ -10,7 +10,7 @@ const VoiceTrainingPage = () => {
         <div style={styles.container}>
             <Logo />
             <h2 style={styles.title}>목소리를 학습하겠습니다.</h2>
-            <p style={styles.subtilte}>(아래의 마이크 버튼을 누르고 텍스트를 읽어주세요.)</p>
+            <p style={styles.subtitle}>(아래의 마이크 버튼을 누르고 텍스트를 읽어주세요.)</p>
 
             <div style={styles.memoContainer}>
                 <img src="/images/memo_background.png" alt="Memo" style={styles.memoImage}/>
@@ -21,7 +21,7 @@ const VoiceTrainingPage = () => {
 
             <MicButton />
 
-            <button style={styles.nextButton} onlick={() => navigate("/")}>
+            <button style={styles.nextButton} onClick={() => navigate("/")}>
                 넘어가기
             </button>
         </div>
@@ -34,7 +34,7 @@ const styles = {
         flexDirection: "column",
         alignItems: "center",
         justifyContent : "center",
-        hegith : "100vh",
+        minHeight : "100vh",
         backgroundColor : "#F8EAD2",
     },
     title: {
@@ -76,3 +76,5 @@ const styles = {
         cursor: "pointer",
     },
 };
+
+export default VoiceTrainingPage;
