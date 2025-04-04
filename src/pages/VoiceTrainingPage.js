@@ -21,7 +21,7 @@ const VoiceTrainingPage = () => {
 
             <MicButton />
 
-            <button style={styles.nextButton} onClick={() => navigate("/")}>
+            <button style={styles.nextButton} onClick={() => navigate("/keywords")}>
                 넘어가기
             </button>
         </div>
