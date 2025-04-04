@@ -1,13 +1,69 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import TimePicker from "react-time-picker";
+import "react-time-picker/dist/TimePicker.css";
+import "react-clock/dist/Clock.css";
 import Logo from "../components/Logo";
 
 const keywords = {
-    "수면여부 확인": ["아침", "밤"],
-    "식사여부 확인": ["아침", "점심", "저녁"],
+    "수면 여부 확인": ["아침", "밤"],
+    "식사 여부 확인": ["아침", "점심", "저녁"],
     "약 복용 여부 확인": ["아침", "점심", "저녁"],
     "활동 여부 확인": ["외출", "청소", "교회", "운동", "목욕"],
     "심리적 상태 체크": ["O", "X"]
+};
+
+const timeSettingKeywords = {
+    "수면 여부 확인": ["아침"],
+    "식사 여부 확인": ["아침", "점심", "저녁"],
+    "약 복용 여부 확인": ["아침", "점심", "저녁"]
+};
+
+const weekdays = ["월", "화", "수", "목", "금", "토", "일"];
+
+const TimeSetting = ({ value, onSave }) => {
+    const [tempTime, setTempTime] = useState(value.time);
+    const [tempDays, setTempDays] = useState(value.days || []);
+
+    const toggleDay = (day) => {
+        setTempDays((prev) =>
+            prev.includes(day) ? prev.filter((d) => d !== day) : [...prev, day]
+        );
+    };
+
+    const handleSave = () => {
+        onSave({
+            time: tempTime,
+            days: tempDays
+        });
+    };
+
+    return (
+        <div style={styles.timeSettingContainer}>
+            <div style={styles.weekdayContainer}>
+                {weekdays.map((day) => (
+                    <button
+                        key={day}
+                        onClick={() => toggleDay(day)}
+                        style={{
+                            ...styles.dayButton,
+                            backgroundColor: tempDays.includes(day) ? "#DABEC9" : "#EEE"
+                        }}
+                    >
+                        {day}
+                    </button>
+                ))}
+            </div>
+            <TimePicker
+                onChange={setTempTime}
+                value={tempTime}
+                disableClock
+                clearIcon={null}
+                format="HH:mm"
+            />
+            <button style={styles.saveButton} onClick={handleSave}>저장</button>
+        </div>
+    );
 };
 
 const KeywordSelectionPage = () => {
@@ -16,7 +72,13 @@ const KeywordSelectionPage = () => {
     const [selected, setSelected] = useState(
         Object.keys(keywords).reduce((acc, category) => {
             acc[category] = {};
-            keywords[category].forEach((keyword) => (acc[category][keyword] = false));
+            keywords[category].forEach((keyword) => {
+                acc[category][keyword] = {
+                    selected: false,
+                    time: "08:00",
+                    days: []
+                };
+            });
             return acc;
         }, {})
     );
@@ -26,7 +88,23 @@ const KeywordSelectionPage = () => {
             ...prev,
             [category]: {
                 ...prev[category],
-                [keyword]: !prev[category][keyword] // 해당 키워드만 변경
+                [keyword]: {
+                    ...prev[category][keyword],
+                    selected: !prev[category][keyword].selected
+                }
+            }
+        }));
+    };
+
+    const saveTimeAndDays = (category, keyword, newData) => {
+        setSelected((prev) => ({
+            ...prev,
+            [category]: {
+                ...prev[category],
+                [keyword]: {
+                    ...prev[category][keyword],
+                    ...newData
+                }
             }
         }));
     };
@@ -40,17 +118,28 @@ const KeywordSelectionPage = () => {
                     <p style={styles.categoryTitle}>• {category}</p>
                     <div style={styles.buttonContainer}>
                         {options.map((keyword) => (
-                            <button
-                                key={keyword}
-                                style={{
-                                    ...styles.keywordButton,
-                                    backgroundColor: selected[category][keyword] ? "#DABEC9" : "#FFF",
-                                    color: selected[category][keyword] ? "#FFF" : "#000",
-                                }}
-                                onClick={() => toggleSelection(category, keyword)}
-                            >
-                                {keyword}
-                            </button>
+                            <div key={keyword} style={styles.keywordBlock}>
+                                <button
+                                    style={{
+                                        ...styles.keywordButton,
+                                        backgroundColor: selected[category][keyword].selected ? "#DABEC9" : "#FFF",
+                                        color: selected[category][keyword].selected ? "#FFF" : "#000",
+                                    }}
+                                    onClick={() => toggleSelection(category, keyword)}
+                                >
+                                    {keyword}
+                                </button>
+                                {selected[category][keyword].selected &&
+                                    timeSettingKeywords[category]?.includes(keyword) && (
+                                        <TimeSetting
+                                            value={{
+                                                time: selected[category][keyword].time,
+                                                days: selected[category][keyword].days
+                                            }}
+                                            onSave={(data) => saveTimeAndDays(category, keyword, data)}
+                                        />
+                                    )}
+                            </div>
                         ))}
                     </div>
                 </div>
@@ -68,6 +157,7 @@ const styles = {
         backgroundColor: "#F8EAD2",
         height: "100vh",
         padding: "20px",
+        overflowY: "auto",
     },
     title: {
         fontSize: "18px",
@@ -89,6 +179,12 @@ const styles = {
         flexWrap: "wrap",
         gap: "10px",
     },
+    keywordBlock: {
+        display: "flex",
+        flexDirection: "column",
+        alignItems: "center",
+        gap: "5px",
+    },
     keywordButton: {
         border: "2px solid black",
         borderRadius: "20px",
@@ -105,6 +201,38 @@ const styles = {
         cursor: "pointer",
         marginTop: "20px",
     },
+    timeSettingContainer: {
+        display: "flex",
+        flexDirection: "column",
+        alignItems: "center",
+        gap: "10px",
+        backgroundColor: "#FFF",
+        padding: "10px",
+        borderRadius: "10px",
+        border: "1px solid #ccc",
+        marginTop: "5px",
+    },
+    weekdayContainer: {
+        display: "flex",
+        gap: "6px",
+        flexWrap: "wrap",
+        justifyContent: "center",
+    },
+    dayButton: {
+        padding: "5px 8px",
+        borderRadius: "6px",
+        border: "1px solid #888",
+        cursor: "pointer",
+        fontSize: "12px",
+    },
+    saveButton: {
+        fontSize: "12px",
+        padding: "5px 10px",
+        borderRadius: "5px",
+        backgroundColor: "#DABEC9",
+        border: "none",
+        cursor: "pointer"
+    }
 };
 
 export default KeywordSelectionPage;
