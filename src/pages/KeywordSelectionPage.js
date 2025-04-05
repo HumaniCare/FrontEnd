@@ -144,7 +144,7 @@ const KeywordSelectionPage = () => {
                     </div>
                 </div>
             ))}
-            <button style={styles.completeButton} onClick={() => navigate("/")}>완료</button>
+            <button style={styles.completeButton} onClick={() => navigate("/final")}>완료</button>
         </div>
     );
 };
