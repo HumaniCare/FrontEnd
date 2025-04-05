@@ -1,4 +1,5 @@
 import React from "react";
+import KakaoRedirectPage from "./components/oauth/KakaoRedirectPage";
 import {BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import LoginPage from "./pages/LoginPage";
 import SignupPage from "./pages/SignupPage";
@@ -16,6 +17,9 @@ function App() {
         <Route path="/voice-training" element={<VoiceTrainingPage/>} />
         <Route path="/keywords" element={<KeywordSelectionPage/>} />
         <Route path="/final" element={<FinalPage/>} />
+
+        {/* 카카오 로그인 리다이렉트 경로 추가 */}
+        <Route path="/login/oauth2/code/kakao" element={<KakaoRedirectPage />} />
       </Routes>
     </Router>
   );
