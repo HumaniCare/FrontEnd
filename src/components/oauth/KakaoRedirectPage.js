@@ -54,7 +54,6 @@ const KakaoRedirectPage = () => {
 
     return (
         <div>
-            <Loading />  {/* 로딩 화면 표시 */}
         </div>
     );
 };
