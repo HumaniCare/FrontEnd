@@ -25,9 +25,9 @@ const KakaoRedirectPage = () => {
                     // 사용자의 역할(role)에 따라 페이지 이동
                     const role = response.data.result;
                     if (role === "GUEST") {
-                        navigate("/signup");  // 게스트 페이지로 이동
+                        navigate("/voice-training");  // 게스트 페이지로 이동
                     } else if (role === "USER") {
-                        navigate("/signup");  // 사용자 메인 페이지로 이동
+                        navigate("/voice-training");  // 사용자 메인 페이지로 이동
                     }
                 } else {
                     // 로그인 실패 처리
