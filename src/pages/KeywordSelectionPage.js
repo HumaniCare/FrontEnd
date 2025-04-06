@@ -1,12 +1,12 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import TimePicker from "react-time-picker";
 import "react-time-picker/dist/TimePicker.css";
-import { LOCAL_SPRING_API_URL } from "../constants/api";
 import "react-clock/dist/Clock.css";
 import Logo from "../components/Logo";
 import axios from "axios";
-import { getAccessToken } from "../components/Header"; // 토큰 불러오기
+import { LOCAL_SPRING_API_URL } from "../constants/api";
+import { getAccessToken } from "../components/Header";
 
 const keywords = {
     "수면 여부 확인": ["아침", "밤"],
@@ -16,30 +16,35 @@ const keywords = {
     "심리적 상태 체크": ["O", "X"]
 };
 
-const timeSettingKeywords = {
-    "수면 여부 확인": ["아침", "밤"],
-    "식사 여부 확인": ["아침", "점심", "저녁"],
-    "약 복용 여부 확인": ["아침", "점심", "저녁"],
-    "활동 여부 확인": ["외출", "청소", "교회", "운동", "목욕"],
-};
+const timeSettingKeywords = new Set([
+    "수면 여부 확인", "식사 여부 확인", "약 복용 여부 확인", "활동 여부 확인"
+]);
 
 const weekdays = ["월", "화", "수", "목", "금", "토", "일"];
+const dayMap = {
+    "월": "MONDAY", "화": "TUESDAY", "수": "WEDNESDAY",
+    "목": "THURSDAY", "금": "FRIDAY", "토": "SATURDAY", "일": "SUNDAY"
+};
+const reverseDayMap = Object.fromEntries(
+    Object.entries(dayMap).map(([k, v]) => [v, k])
+);
 
+// 요일 및 시간 선택 컴포넌트
 const TimeSetting = ({ value, onSave }) => {
-    const [tempTime, setTempTime] = useState(value.time);
-    const [tempDays, setTempDays] = useState(value.days || []);
+    const [time, setTime] = useState(value.time);
+    const [days, setDays] = useState(value.days || []);
 
     const toggleDay = (day) => {
-        const updatedDays = tempDays.includes(day)
-            ? tempDays.filter((d) => d !== day)
-            : [...tempDays, day];
-        setTempDays(updatedDays);
-        onSave({ time: tempTime, days: updatedDays }); // 자동 저장
+        const newDays = days.includes(day)
+            ? days.filter(d => d !== day)
+            : [...days, day];
+        setDays(newDays);
+        onSave({ time, days: newDays });
     };
 
     const handleTimeChange = (newTime) => {
-        setTempTime(newTime);
-        onSave({ time: newTime, days: tempDays }); // 자동 저장
+        setTime(newTime);
+        onSave({ time: newTime, days });
     };
 
     return (
@@ -51,7 +56,7 @@ const TimeSetting = ({ value, onSave }) => {
                         onClick={() => toggleDay(day)}
                         style={{
                             ...styles.dayButton,
-                            backgroundColor: tempDays.includes(day) ? "#DABEC9" : "#EEE"
+                            backgroundColor: days.includes(day) ? "#DABEC9" : "#EEE"
                         }}
                     >
                         {day}
@@ -60,7 +65,7 @@ const TimeSetting = ({ value, onSave }) => {
             </div>
             <TimePicker
                 onChange={handleTimeChange}
-                value={tempTime}
+                value={time}
                 disableClock
                 clearIcon={null}
                 format="HH:mm"
@@ -69,25 +74,86 @@ const TimeSetting = ({ value, onSave }) => {
     );
 };
 
+// 키워드 옵션 컴포넌트
+const KeywordOption = ({ category, keyword, data, onToggle, onSave }) => (
+    <div style={styles.keywordBlock}>
+        <button
+            onClick={onToggle}
+            style={{
+                ...styles.keywordButton,
+                backgroundColor: data.selected ? "#DABEC9" : "#FFF",
+                color: data.selected ? "#FFF" : "#000",
+            }}
+        >
+            {keyword}
+        </button>
+        {data.selected && timeSettingKeywords.has(category) && (
+            <TimeSetting
+                value={{ time: data.time, days: data.days }}
+                onSave={onSave}
+            />
+        )}
+    </div>
+);
+
+// 메인 컴포넌트
 const KeywordSelectionPage = () => {
     const navigate = useNavigate();
 
     const [selected, setSelected] = useState(
-        Object.keys(keywords).reduce((acc, category) => {
-            acc[category] = {};
-            keywords[category].forEach((keyword) => {
-                acc[category][keyword] = {
-                    selected: false,
-                    time: "08:00",
-                    days: []
-                };
-            });
-            return acc;
-        }, {})
+        Object.fromEntries(
+            Object.entries(keywords).map(([category, list]) => [
+                category,
+                Object.fromEntries(
+                    list.map((keyword) => [
+                        keyword,
+                        { selected: false, time: "08:00", days: [] }
+                    ])
+                )
+            ])
+        )
     );
 
+    useEffect(() => {
+        const fetchData = async () => {
+            const token = getAccessToken();
+            if (!token) return;
+
+            try {
+                const response = await axios.get(`${LOCAL_SPRING_API_URL}/basic-schedules`, {
+                    headers: {
+                        Authorization: `Bearer ${token}`,
+                    }
+                });
+
+                const updatedSelected = JSON.parse(JSON.stringify(selected)); // deep copy
+
+                response.data.forEach(item => {
+                    const [categoryPrefix, keyword] = item.scheduleTitle.split("_");
+                    const category = Object.keys(keywords).find(c => c.replace(/\s/g, "") === categoryPrefix);
+                    if (!category || !keywords[category].includes(keyword)) return;
+
+                    const time = item.startTime.slice(0, 5); // "HH:mm:ss" -> "HH:mm"
+                    const days = item.days.map(d => reverseDayMap[d]).filter(Boolean);
+
+                    updatedSelected[category][keyword] = {
+                        selected: true,
+                        time,
+                        days
+                    };
+                });
+
+                setSelected(updatedSelected);
+            } catch (error) {
+                console.error("기존 키워드 데이터를 불러오는 중 오류 발생:", error);
+            }
+        };
+
+        fetchData();
+    }, []);
+
     const toggleSelection = (category, keyword) => {
-        setSelected((prev) => ({
+        setSelected(prev => ({
             ...prev,
             [category]: {
                 ...prev[category],
@@ -100,14 +166,11 @@ const KeywordSelectionPage = () => {
     };
 
     const saveTimeAndDays = (category, keyword, newData) => {
-        setSelected((prev) => ({
+        setSelected(prev => ({
             ...prev,
             [category]: {
                 ...prev[category],
-                [keyword]: {
-                    ...prev[category][keyword],
-                    ...newData
-                }
+                [keyword]: { ...prev[category][keyword], ...newData }
             }
         }));
     };
@@ -119,26 +182,15 @@ const KeywordSelectionPage = () => {
             return;
         }
 
-        const dayMap = {
-            "월": "MONDAY",
-            "화": "TUESDAY",
-            "수": "WEDNESDAY",
-            "목": "THURSDAY",
-            "금": "FRIDAY",
-            "토": "SATURDAY",
-            "일": "SUNDAY"
-        };
-
         const payload = [];
 
-        for (const category in selected) {
-            for (const keyword in selected[category]) {
-                const item = selected[category][keyword];
-                if (item.selected && item.days.length > 0) {
+        for (const [category, options] of Object.entries(selected)) {
+            for (const [keyword, { selected, time, days }] of Object.entries(options)) {
+                if (selected && days.length > 0) {
                     payload.push({
                         scheduleTitle: `${category.replace(/\s/g, "")}_${keyword}`,
-                        startTime: item.time + ":00",
-                        days: item.days.map(day => dayMap[day])
+                        startTime: time + ":00",
+                        days: days.map(d => dayMap[d])
                     });
                 }
             }
@@ -171,28 +223,14 @@ const KeywordSelectionPage = () => {
                     <p style={styles.categoryTitle}>• {category}</p>
                     <div style={styles.buttonContainer}>
                         {options.map((keyword) => (
-                            <div key={keyword} style={styles.keywordBlock}>
-                                <button
-                                    style={{
-                                        ...styles.keywordButton,
-                                        backgroundColor: selected[category][keyword].selected ? "#DABEC9" : "#FFF",
-                                        color: selected[category][keyword].selected ? "#FFF" : "#000",
-                                    }}
-                                    onClick={() => toggleSelection(category, keyword)}
-                                >
-                                    {keyword}
-                                </button>
-                                {selected[category][keyword].selected &&
-                                    timeSettingKeywords[category]?.includes(keyword) && (
-                                        <TimeSetting
-                                            value={{
-                                                time: selected[category][keyword].time,
-                                                days: selected[category][keyword].days
-                                            }}
-                                            onSave={(data) => saveTimeAndDays(category, keyword, data)}
-                                        />
-                                    )}
-                            </div>
+                            <KeywordOption
+                                key={keyword}
+                                category={category}
+                                keyword={keyword}
+                                data={selected[category][keyword]}
+                                onToggle={() => toggleSelection(category, keyword)}
+                                onSave={(data) => saveTimeAndDays(category, keyword, data)}
+                            />
                         ))}
                     </div>
                 </div>

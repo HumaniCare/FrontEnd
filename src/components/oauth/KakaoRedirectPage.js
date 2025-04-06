@@ -21,8 +21,10 @@ const KakaoRedirectPage = () => {
                     localStorage.setItem("accessToken", accessToken);
 
                     const role = response.data.result;
-                    if (role === "GUEST" || role === "USER") {
+                    if (role === "ROLE_FIRST") {
                         navigate("/voice-training");
+                    } else {
+                        navigate("/keywords");
                     }
                 } else {
                     console.error("OAuth2 로그인 오류");
