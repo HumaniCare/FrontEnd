@@ -17,9 +17,10 @@ const keywords = {
 };
 
 const timeSettingKeywords = {
-    "수면 여부 확인": ["아침"],
+    "수면 여부 확인": ["아침", "밤"],
     "식사 여부 확인": ["아침", "점심", "저녁"],
-    "약 복용 여부 확인": ["아침", "점심", "저녁"]
+    "약 복용 여부 확인": ["아침", "점심", "저녁"],
+    "활동 여부 확인": ["외출", "청소", "교회", "운동", "목욕"],
 };
 
 const weekdays = ["월", "화", "수", "목", "금", "토", "일"];
@@ -32,13 +33,6 @@ const TimeSetting = ({ value, onSave }) => {
         setTempDays((prev) =>
             prev.includes(day) ? prev.filter((d) => d !== day) : [...prev, day]
         );
-    };
-
-    const handleSave = () => {
-        onSave({
-            time: tempTime,
-            days: tempDays
-        });
     };
 
     return (
@@ -64,7 +58,6 @@ const TimeSetting = ({ value, onSave }) => {
                 clearIcon={null}
                 format="HH:mm"
             />
-            <button style={styles.saveButton} onClick={handleSave}>저장</button>
         </div>
     );
 };
@@ -138,7 +131,7 @@ const KeywordSelectionPage = () => {
                 const item = selected[category][keyword];
                 if (item.selected && item.days.length > 0) {
                     payload.push({
-                        scheduleTitle: `${category} - ${keyword}`,
+                        scheduleTitle: `${category.replace(/\s/g, "")}_${keyword}`,
                         startTime: item.time + ":00",
                         days: item.days.map(day => dayMap[day])
                     });

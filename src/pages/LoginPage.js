@@ -2,7 +2,7 @@ import React from "react";
 import { useNavigate } from "react-router-dom";
 import Button from "../components/Button";
 import Logo from "../components/Logo";
-import { LOCAL_SPRING_API_URL } from "../../constants/api";
+import { LOCAL_SPRING_API_URL } from "../constants/api";
 
 const LoginPage = () => {
     const navigate = useNavigate();
