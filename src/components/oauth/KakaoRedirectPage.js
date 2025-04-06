@@ -2,7 +2,6 @@ import React, { useEffect } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import instance from "../../axios/TokenInterceptor"; // instance를 계속 사용하려면
 import { LOCAL_SPRING_API_URL } from "../../constants/api";
-import Loading from "../Loading";
 
 // 카카오 OAuth 인증 후 리디렉션 처리 페이지
 const KakaoRedirectPage = () => {
