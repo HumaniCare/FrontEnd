@@ -30,9 +30,16 @@ const TimeSetting = ({ value, onSave }) => {
     const [tempDays, setTempDays] = useState(value.days || []);
 
     const toggleDay = (day) => {
-        setTempDays((prev) =>
-            prev.includes(day) ? prev.filter((d) => d !== day) : [...prev, day]
-        );
+        const updatedDays = tempDays.includes(day)
+            ? tempDays.filter((d) => d !== day)
+            : [...tempDays, day];
+        setTempDays(updatedDays);
+        onSave({ time: tempTime, days: updatedDays }); // 자동 저장
+    };
+
+    const handleTimeChange = (newTime) => {
+        setTempTime(newTime);
+        onSave({ time: newTime, days: tempDays }); // 자동 저장
     };
 
     return (
@@ -52,7 +59,7 @@ const TimeSetting = ({ value, onSave }) => {
                 ))}
             </div>
             <TimePicker
-                onChange={setTempTime}
+                onChange={handleTimeChange}
                 value={tempTime}
                 disableClock
                 clearIcon={null}
@@ -111,8 +118,7 @@ const KeywordSelectionPage = () => {
             alert("로그인이 필요합니다.");
             return;
         }
-    
-        // 요일 변환 맵
+
         const dayMap = {
             "월": "MONDAY",
             "화": "TUESDAY",
@@ -122,10 +128,9 @@ const KeywordSelectionPage = () => {
             "토": "SATURDAY",
             "일": "SUNDAY"
         };
-    
-        // selected 가공
+
         const payload = [];
-    
+
         for (const category in selected) {
             for (const keyword in selected[category]) {
                 const item = selected[category][keyword];
@@ -138,10 +143,10 @@ const KeywordSelectionPage = () => {
                 }
             }
         }
-    
+
         try {
             const response = await axios.post(
-                `${ LOCAL_SPRING_API_URL }/basic-schedules`, // 실제 API 주소로 교체
+                `${LOCAL_SPRING_API_URL}/basic-schedules`,
                 payload,
                 {
                     headers: {
@@ -272,14 +277,6 @@ const styles = {
         border: "1px solid #888",
         cursor: "pointer",
         fontSize: "12px",
-    },
-    saveButton: {
-        fontSize: "12px",
-        padding: "5px 10px",
-        borderRadius: "5px",
-        backgroundColor: "#DABEC9",
-        border: "none",
-        cursor: "pointer"
     }
 };
 
