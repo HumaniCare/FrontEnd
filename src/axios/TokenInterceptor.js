@@ -70,12 +70,16 @@ instance.interceptors.response.use(async function (response) {
 });
 
 
-const Logout = async () => {
+export const Logout = async () => {
     try {
-        // 로그아웃 API 호출
-        await axios.post(`${LOCAL_SPRING_API_URL}/logout`);
+        const token = localStorage.getItem('accessToken');
+        await axios.post(`${LOCAL_SPRING_API_URL}/logout`, null, {
+            headers: {
+                Authorization: `Bearer ${token}`
+            }
+        });
         localStorage.removeItem('accessToken');
-        window.location.href = '/'; // 로그인 페이지 이동
+        window.location.href = '/'; // 로그인 페이지로 이동
     } catch (error) {
         console.error('로그아웃 오류 발생:', error);
     }

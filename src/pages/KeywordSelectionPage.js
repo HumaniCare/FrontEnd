@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import TimePicker from "react-time-picker";
 import "react-time-picker/dist/TimePicker.css";
 import "react-clock/dist/Clock.css";
@@ -29,7 +29,6 @@ const reverseDayMap = Object.fromEntries(
     Object.entries(dayMap).map(([k, v]) => [v, k])
 );
 
-// 요일 및 시간 선택 컴포넌트
 const TimeSetting = ({ value, onSave }) => {
     const [time, setTime] = useState(value.time);
     const [days, setDays] = useState(value.days || []);
@@ -74,7 +73,6 @@ const TimeSetting = ({ value, onSave }) => {
     );
 };
 
-// 키워드 옵션 컴포넌트
 const KeywordOption = ({ category, keyword, data, onToggle, onSave }) => (
     <div style={styles.keywordBlock}>
         <button
@@ -96,9 +94,9 @@ const KeywordOption = ({ category, keyword, data, onToggle, onSave }) => (
     </div>
 );
 
-// 메인 컴포넌트
 const KeywordSelectionPage = () => {
     const navigate = useNavigate();
+    const { id } = useParams();
 
     const [selected, setSelected] = useState(
         Object.fromEntries(
@@ -120,20 +118,27 @@ const KeywordSelectionPage = () => {
             if (!token) return;
 
             try {
-                const response = await axios.get(`${LOCAL_SPRING_API_URL}/basic-schedules`, {
-                    headers: {
-                        Authorization: `Bearer ${token}`,
+                const response = await axios.get(
+                    `${LOCAL_SPRING_API_URL}/all-basic-schedules`,
+                    {
+                        headers: { Authorization: `Bearer ${token}` },
                     }
-                });
+                );
+                console.log("확인하기");
+                const schedules = response.data.result;
+                console.log("JSON 파싱 직전");
+                console.log(schedules);
 
-                const updatedSelected = JSON.parse(JSON.stringify(selected)); // deep copy
+                const updatedSelected = JSON.parse(JSON.stringify(selected));
 
-                response.data.forEach(item => {
+                schedules.forEach(item => {
                     const [categoryPrefix, keyword] = item.scheduleTitle.split("_");
-                    const category = Object.keys(keywords).find(c => c.replace(/\s/g, "") === categoryPrefix);
+                    const category = Object.keys(keywords).find(
+                        c => c.replace(/\s/g, "") === categoryPrefix
+                    );
                     if (!category || !keywords[category].includes(keyword)) return;
 
-                    const time = item.startTime.slice(0, 5); // "HH:mm:ss" -> "HH:mm"
+                    const time = item.startTime.slice(0, 5);
                     const days = item.days.map(d => reverseDayMap[d]).filter(Boolean);
 
                     updatedSelected[category][keyword] = {
@@ -150,7 +155,7 @@ const KeywordSelectionPage = () => {
         };
 
         fetchData();
-    }, []);
+    }, [id]);
 
     const toggleSelection = (category, keyword) => {
         setSelected(prev => ({
@@ -183,7 +188,6 @@ const KeywordSelectionPage = () => {
         }
 
         const payload = [];
-
         for (const [category, options] of Object.entries(selected)) {
             for (const [keyword, { selected, time, days }] of Object.entries(options)) {
                 if (selected && days.length > 0) {
