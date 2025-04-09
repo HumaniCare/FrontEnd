@@ -1,6 +1,8 @@
+// FinalPage.jsx
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import Logo from "../components/Logo";
+import { Logout } from "../axios/TokenInterceptor"; // 실제 axios 파일 경로에 맞게 수정
 
 const FinalPage = () => {
     const navigate = useNavigate();
@@ -10,9 +12,9 @@ const FinalPage = () => {
         setShowConfirm(true);
     };
 
-    const handleConfirmYes = () => {
+    const handleConfirmYes = async () => {
         setShowConfirm(false);
-        navigate('/');
+        await Logout();  // 로그아웃 처리 및 이동
     };
 
     const handleConfirmNo = () => {
@@ -40,6 +42,7 @@ const FinalPage = () => {
         </div>
     );
 };
+
 
 const styles = {
     container: {
