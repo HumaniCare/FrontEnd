@@ -24,7 +24,7 @@ const KakaoRedirectPage = () => {
                     if (role === "ROLE_FIRST") {
                         navigate("/voice-training");
                     } else {
-                        navigate("/keywords");
+                        navigate("/home");
                     }
                 } else {
                     console.error("OAuth2 로그인 오류");

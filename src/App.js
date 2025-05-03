@@ -6,6 +6,9 @@ import SignupPage from "./pages/SignupPage";
 import VoiceTrainingPage from "./pages/VoiceTrainingPage";
 import KeywordSelectionPage from "./pages/KeywordSelectionPage";
 import FinalPage from "./pages/FinalPage";
+import HomePage from "./pages/HomePage"; 
+import ReportsPage from "./pages/ReportsPage";
+
 
 
 function App() {
@@ -17,6 +20,8 @@ function App() {
         <Route path="/voice-training" element={<VoiceTrainingPage/>} />
         <Route path="/keywords" element={<KeywordSelectionPage/>} />
         <Route path="/final" element={<FinalPage/>} />
+        <Route path="/home" element={<HomePage />} /> 
+        <Route path="/reports" element={<ReportsPage />} />
 
         {/* 카카오 로그인 리다이렉트 경로 추가 */}
         <Route path="/login/oauth2/code/kakao" element={<KakaoRedirectPage />} />
