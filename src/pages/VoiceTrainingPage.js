@@ -14,9 +14,13 @@ const VoiceTrainingPage = () => {
 
             <div style={styles.memoContainer}>
                 <img src="/images/memo_background.png" alt="Memo" style={styles.memoImage}/>
-                <p style = {styles.memoText}>
-                    안촉촉한 초코칩 나라에 살던 안촉촉한 초코칩이 초초초초초초콬초코촠칩.. 아직 미정이에유.. 텍스트 분석하기 좋은 글들을 넣어봅시다. 
-                </p>
+                <div style={styles.memoText}>
+                    <p>오늘 하루는 어땠나요? 기분이 괜찮으신가요?</p>
+                    <p>밖에 나가서 산책도 하셨어요?</p>
+                    <p>식사는 잘 챙기셨는지 궁금합니다.</p>
+                    <p>약은 꼭 챙겨드셔야 해요. 잊지 마세요.</p>
+                    <p>목소리를 들으니 안심이 됩니다.</p>
+                </div>
             </div>
 
             <MicButton />
@@ -48,25 +52,25 @@ const styles = {
     },
     memoContainer: {
         position: "relative",
-        width: "250px",
-        height: "200px",
+        width: "300px",  // 너비 약간 키움
+        padding: "20px", // 내부 여백
+        backgroundImage: "url('/images/memo_background.png')",
+        backgroundSize: "cover",
+        backgroundRepeat: "no-repeat",
         marginBottom: "20px",
-    },
-    memoImage: {
-        width : "100%",
-        height : "100%",
-        objectFit : "cover",
-    },
-    memoText: {
-        position: "absolute",
-        top: "20px",
-        left: "20px",
-        right: "20px",
+        borderRadius: "10px",
+      },
+      
+      memoImage: {
+        display: "none", // 안 써도 됨 (backgroundImage로 대체했기 때문)
+      },
+      
+      memoText: {
         fontSize: "14px",
-        textAlign : "center",
-        lineHeight : "1.5",
-        fontWeight : "bold",
-    },
+        lineHeight: "1.6",
+        fontWeight: "bold",
+        textAlign: "left",
+      },
     nextButton: {
         backgroundColor : "#DABEC9",
         border: "none",
