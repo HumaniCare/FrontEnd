@@ -1,7 +1,7 @@
 import React, { useEffect, useRef } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import instance from "../../axios/TokenInterceptor";
-import { SPRING_API_URL } from "../constants/api";
+import { SPRING_API_URL } from "../../constants/api";
 
 const KakaoRedirectPage = () => {
     const location = useLocation();
