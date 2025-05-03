@@ -2,12 +2,12 @@ import React from "react";
 import { useNavigate } from "react-router-dom";
 import Button from "../components/Button";
 import Logo from "../components/Logo";
-import { LOCAL_SPRING_API_URL } from "../constants/api";
+import { SPRING_API_URL } from "../constants/api";
 
 const LoginPage = () => {
     const navigate = useNavigate();
     const handleKakaoLogin = () => {
-        window.location.href = `${LOCAL_SPRING_API_URL}/oauth/kakao`;
+        window.location.href = `${ SPRING_API_URL}/oauth/kakao`;
     };
 
     return (

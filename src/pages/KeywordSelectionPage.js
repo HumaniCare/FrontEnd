@@ -5,7 +5,7 @@ import "react-time-picker/dist/TimePicker.css";
 import "react-clock/dist/Clock.css";
 import Logo from "../components/Logo";
 import axios from "axios";
-import { LOCAL_SPRING_API_URL } from "../constants/api";
+import { SPRING_API_URL } from "../constants/api";
 import { getAccessToken } from "../components/Header";
 
 const keywords = {
@@ -119,7 +119,7 @@ const KeywordSelectionPage = () => {
 
             try {
                 const response = await axios.get(
-                    `${LOCAL_SPRING_API_URL}/all-basic-schedules`,
+                    `${SPRING_API_URL}/all-basic-schedules`,
                     {
                         headers: { Authorization: `Bearer ${token}` },
                     }
@@ -202,7 +202,7 @@ const KeywordSelectionPage = () => {
 
         try {
             const response = await axios.post(
-                `${LOCAL_SPRING_API_URL}/basic-schedules`,
+                `${ SPRING_API_URL}/basic-schedules`,
                 payload,
                 {
                     headers: {
