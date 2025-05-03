@@ -1,7 +1,7 @@
 import React, { useEffect, useRef } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import instance from "../../axios/TokenInterceptor";
-import { LOCAL_SPRING_API_URL } from "../../constants/api";
+import { SPRING_API_URL } from "../constants/api";
 
 const KakaoRedirectPage = () => {
     const location = useLocation();
@@ -12,7 +12,7 @@ const KakaoRedirectPage = () => {
         const handleOAuthKakao = async (code) => {
             try {
                 const response = await instance.get(
-                    `${LOCAL_SPRING_API_URL}/oauth/login/kakao?code=${code}`
+                    `${ SPRING_API_URL}/oauth/login/kakao?code=${code}`
                 );
 
                 if (response.data.isSuccess) {

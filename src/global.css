@@ -1,0 +1,54 @@
+/* 기본 설정 */
+* {
+    box-sizing: border-box;
+  }
+  
+  body {
+    margin: 0;
+    padding: 0;
+    background-color: var(--bg-color);
+    font-family: "Noto Sans KR", sans-serif;
+  }
+  
+  /* CSS 변수 정의  */
+  :root {
+    --bg-color: #f8ead2;
+    --accent-color: #dabec9;
+    --font-dark: #1c2c5b;
+    --font-light: #999;
+    --btn-radius: 12px;
+  }
+  
+  /* 버튼 스타일 */
+  .button-basic {
+    padding: 12px 24px;
+    border: 1px solid #333;
+    background-color: white;
+    border-radius: var(--btn-radius);
+    font-size: 16px;
+    cursor: pointer;
+  }
+  
+  .button-accent {
+    background-color: var(--accent-color);
+    color: white;
+    border: none;
+  }
+  
+  /* 센터 정렬 */
+  .flex-center {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
+  
+  /* 카드/박스  */
+  .card {
+    background-color: white;
+    border: 1px solid #ccc;
+    border-radius: var(--btn-radius);
+    padding: 20px;
+    box-shadow: 2px 2px 6px rgba(0,0,0,0.1);
+  }
+
+  

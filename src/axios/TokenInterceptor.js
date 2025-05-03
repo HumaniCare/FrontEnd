@@ -1,5 +1,5 @@
 import axios from 'axios';
-import {LOCAL_SPRING_API_URL} from "../constants/api";
+import { SPRING_API_URL } from "../constants/api";
 
 const instance = axios.create();
 
@@ -49,7 +49,7 @@ instance.interceptors.response.use(async function (response) {
         }
         if (data.message === "유효하지 않은 토큰") {
             try {
-                const tokenReissueResult = await instance.post(`${LOCAL_SPRING_API_URL}/reissue`);
+                const tokenReissueResult = await instance.post(`${ SPRING_API_URL}/reissue`);
                 if (tokenReissueResult.status === 200) {
                     // 재발급 성공시 로컬스토리지에 토큰 저장
                     const accessToken = tokenReissueResult.headers['authorization'] || tokenReissueResult.headers['Authorization'];
@@ -73,7 +73,7 @@ instance.interceptors.response.use(async function (response) {
 export const Logout = async () => {
     try {
         const token = localStorage.getItem('accessToken');
-        await axios.post(`${LOCAL_SPRING_API_URL}/logout`, null, {
+        await axios.post(`${ SPRING_API_URL}/logout`, null, {
             headers: {
                 Authorization: `Bearer ${token}`
             }
