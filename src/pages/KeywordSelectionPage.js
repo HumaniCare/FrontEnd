@@ -129,7 +129,17 @@ const KeywordSelectionPage = () => {
                 console.log("JSON 파싱 직전");
                 console.log(schedules);
 
-                const updatedSelected = JSON.parse(JSON.stringify(selected));
+                const updatedSelected = Object.fromEntries(
+                    Object.entries(keywords).map(([category, list]) => [
+                        category,
+                        Object.fromEntries(
+                            list.map((keyword) => [
+                                keyword,
+                                { selected: false, time: "08:00", days: [] }
+                            ])
+                        )
+                    ])
+                );
 
                 schedules.forEach(item => {
                     const [categoryPrefix, keyword] = item.scheduleTitle.split("_");
