@@ -1,10 +1,71 @@
-import React from "react";
+import React, { useState, useRef } from "react";
 import { useNavigate } from "react-router-dom";
-import MicButton from "../components/MicButton";
+import MicRecorder from "mic-recorder-to-mp3";
 import Logo from "../components/Logo";
+import { FASTAPI_API_URL } from "../constants/api";
+
+const recorder = new MicRecorder({ bitRate: 128 });
 
 const VoiceTrainingPage = () => {
     const navigate = useNavigate();
+    const [isRecording, setIsRecording] = useState(false);
+    const [blobURL, setBlobURL] = useState("");
+    const [audioFile, setAudioFile] = useState(null);
+    const audioRef = useRef(null);
+
+    const handleMicClick = async () => {
+        if (!isRecording) {
+            try {
+                await navigator.mediaDevices.getUserMedia({ audio: true });
+                await recorder.start();
+                setIsRecording(true);
+            } catch (err) {
+                alert("마이크 권한이 필요합니다.");
+            }
+        } else {
+            try {
+                const [buffer, blob] = await recorder.stop().getMp3();
+                const file = new File(buffer, "voice.mp3", {
+                    type: blob.type,
+                    lastModified: Date.now(),
+                });
+                setAudioFile(file);
+                setBlobURL(URL.createObjectURL(blob));
+                setIsRecording(false);
+            } catch (e) {
+                console.error("녹음 종료 실패:", e);
+                setIsRecording(false);
+            }
+        }
+    };
+
+    const handleUpload = async () => {
+        if (!audioFile) {
+            alert("녹음된 음성이 없습니다.");
+            return;
+        }
+
+        const formData = new FormData();
+        formData.append("file", audioFile);
+
+        try {
+            const res = await fetch(`${FASTAPI_API_URL}/upload`, {
+                method: "POST",
+                body: formData,
+            });
+            const data = await res.json();
+            console.log("업로드 성공:", data);
+            alert("업로드 완료!");
+        } catch (error) {
+            console.error("업로드 실패:", error);
+            alert("업로드 실패");
+        }
+    };
+
+    const handleReset = () => {
+        setBlobURL("");
+        setAudioFile(null);
+    };
 
     return (
         <div style={styles.container}>
@@ -13,7 +74,6 @@ const VoiceTrainingPage = () => {
             <p style={styles.subtitle}>(아래의 마이크 버튼을 누르고 텍스트를 읽어주세요.)</p>
 
             <div style={styles.memoContainer}>
-                <img src="/images/memo_background.png" alt="Memo" style={styles.memoImage}/>
                 <div style={styles.memoText}>
                     <p>오늘 하루는 어땠나요? 기분이 괜찮으신가요?</p>
                     <p>밖에 나가서 산책도 하셨어요?</p>
@@ -23,7 +83,20 @@ const VoiceTrainingPage = () => {
                 </div>
             </div>
 
-            <MicButton />
+            <button onClick={handleMicClick} style={styles.micButton}>
+                <img src="/images/mic_icon.png" alt="Mic" style={styles.micIcon} />
+                <p>{isRecording ? "🎙 녹음 중... 누르면 종료" : "마이크 누르기"}</p>
+            </button>
+
+            {blobURL && (
+                <div style={styles.audioControls}>
+                    <audio ref={audioRef} src={blobURL} controls />
+                    <div style={styles.controlButtons}>
+                        <button onClick={handleUpload} style={styles.uploadButton}>전송하기</button>
+                        <button onClick={handleReset} style={styles.resetButton}>다시 녹음</button>
+                    </div>
+                </div>
+            )}
 
             <button style={styles.nextButton} onClick={() => navigate("/keywords")}>
                 넘어가기
@@ -52,25 +125,58 @@ const styles = {
     },
     memoContainer: {
         position: "relative",
-        width: "300px",  // 너비 약간 키움
-        padding: "20px", // 내부 여백
+        width: "300px",
+        padding: "20px",
         backgroundImage: "url('/images/memo_background.png')",
         backgroundSize: "cover",
         backgroundRepeat: "no-repeat",
         marginBottom: "20px",
         borderRadius: "10px",
-      },
-      
-      memoImage: {
-        display: "none", // 안 써도 됨 (backgroundImage로 대체했기 때문)
-      },
-      
-      memoText: {
+    },
+    memoText: {
         fontSize: "14px",
         lineHeight: "1.6",
         fontWeight: "bold",
         textAlign: "left",
-      },
+    },
+    micButton: {
+        background: "none",
+        border: "none",
+        cursor: "pointer",
+        marginBottom: "20px",
+        display: "flex",
+        flexDirection: "column",
+        alignItems: "center"
+    },
+    micIcon: {
+        width: "60px",
+        height: "60px",
+    },
+    audioControls: {
+        marginBottom: "20px",
+        display: "flex",
+        flexDirection: "column",
+        alignItems: "center",
+        gap: "10px"
+    },
+    controlButtons: {
+        display: "flex",
+        gap: "10px",
+    },
+    uploadButton: {
+        backgroundColor: "#A0D468",
+        border: "none",
+        padding: "8px 12px",
+        borderRadius: "6px",
+        cursor: "pointer"
+    },
+    resetButton: {
+        backgroundColor: "#ED5565",
+        border: "none",
+        padding: "8px 12px",
+        borderRadius: "6px",
+        cursor: "pointer"
+    },
     nextButton: {
         backgroundColor : "#DABEC9",
         border: "none",

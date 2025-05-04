@@ -1,11 +1,9 @@
 // FinalPage.jsx
 import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
 import Logo from "../components/Logo";
 import { Logout } from "../axios/TokenInterceptor"; // 실제 axios 파일 경로에 맞게 수정
 
 const FinalPage = () => {
-    const navigate = useNavigate();
     const [showConfirm, setShowConfirm] = useState(false);
 
     const handleLogoutClick = () => {
