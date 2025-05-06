@@ -22,7 +22,7 @@ const KakaoRedirectPage = () => {
                     localStorage.setItem("accessToken", accessToken);
 
                     const role = response.data.result;
-                    if (role === "ROLE_FIRST") {
+                    if (role === "FIRST") {
                         navigate("/voice-training");
                     } else {
                         navigate("/home");
