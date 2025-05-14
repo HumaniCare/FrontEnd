@@ -49,7 +49,7 @@ const VoiceTrainingPage = () => {
         formData.append("file", audioFile);
 
         try {
-            const res = await fetch(`${FASTAPI_API_URL}/upload`, {
+            const res = await fetch(`${FASTAPI_API_URL}/voices`, {
                 method: "POST",
                 body: formData,
             });
@@ -85,7 +85,7 @@ const VoiceTrainingPage = () => {
 
             <button onClick={handleMicClick} style={styles.micButton}>
                 <img src="/images/mic_icon.png" alt="Mic" style={styles.micIcon} />
-                <p>{isRecording ? "🎙 녹음 중... 누르면 종료" : "마이크 누르기"}</p>
+                <p>{isRecording ? "녹음 중... 누르면 종료" : "마이크 누르기"}</p>
             </button>
 
             {blobURL && (
