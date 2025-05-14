@@ -12,8 +12,7 @@ const keywords = {
     "수면 여부 확인": ["아침", "밤"],
     "식사 여부 확인": ["아침", "점심", "저녁"],
     "약 복용 여부 확인": ["아침", "점심", "저녁"],
-    "활동 여부 확인": ["외출", "청소", "교회", "운동", "목욕"],
-    "심리적 상태 체크": ["O", "X"]
+    "활동 여부 확인": ["외출", "청소", "교회", "운동", "목욕"]
 };
 
 const timeSettingKeywords = new Set([
@@ -111,6 +110,8 @@ const KeywordSelectionPage = () => {
             ])
         )
     );
+    
+    const [guardianTitle, setGuardianTitle] = useState("");
 
     useEffect(() => {
         const fetchData = async () => {
@@ -210,6 +211,14 @@ const KeywordSelectionPage = () => {
             }
         }
 
+        if (guardianTitle.trim() !== "") {
+            payload.push({
+                scheduleTitle : "GuardianTitle_" + guardianTitle.trim(),
+                startTime: "00:00:00",
+                days: []
+            });
+        }
+
         try {
             const response = await axios.post(
                 `${ SPRING_API_URL}/basic-schedules`,
@@ -230,8 +239,21 @@ const KeywordSelectionPage = () => {
 
     return (
         <div style={styles.container}>
-            <Logo />
-            <h2 style={styles.title}>확인하고 싶은 키워드를 선택해주세요.</h2>
+        <Logo />
+        <h2 style={styles.title}>확인하고 싶은 키워드를 선택해주세요.</h2>
+
+        <div style={styles.contentWrapper}>
+            <div style={styles.leftColumn}>
+                <div style={styles.inputGroup}>
+                    <label style={styles.label}>부르고 싶은 보호자의 호칭을 입력해주세요.</label>
+                <input
+                    style={styles.input}
+                    placeholder="예: 엄마, 아버지"
+                    value={guardianTitle}
+                    onChange={(e) => setGuardianTitle(e.target.value)}
+                />
+            </div>
+
             {Object.entries(keywords).map(([category, options]) => (
                 <div key={category} style={styles.category}>
                     <p style={styles.categoryTitle}>• {category}</p>
@@ -249,6 +271,8 @@ const KeywordSelectionPage = () => {
                     </div>
                 </div>
             ))}
+            </div>
+        </div>
             <button style={styles.completeButton} onClick={handleComplete}>완료</button>
         </div>
     );
@@ -268,6 +292,23 @@ const styles = {
         fontSize: "18px",
         fontWeight: "bold",
         marginBottom: "20px",
+    },
+    inputGroup: {
+        width: "100%",
+        maxWidth: "400px",
+        marginBottom: "15px",
+    },
+    label: {
+        display: "block",
+        marginBottom : "5px",
+        fontWeight: "bold",
+    },
+    input: {
+        width: "100%",
+        padding: "10px",
+        borderRadius: "10px",
+        border: "1px solid #ccc",
+        boxSizing: "border-box",
     },
     category: {
         marginBottom: "15px",
@@ -329,7 +370,19 @@ const styles = {
         border: "1px solid #888",
         cursor: "pointer",
         fontSize: "12px",
-    }
+    },
+    contentWrapper: {
+        display: "flex",
+        justifyContent: "flex-start",
+        width: "100%",
+        maxWidth: "800px",
+    },
+    leftColumn: {
+        display: "flex",
+        flexDirection: "column",
+        alignItems: "flex-start",
+        width: "100%",
+    },
 };
 
 export default KeywordSelectionPage;
