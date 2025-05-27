@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom";
 import MicRecorder from "mic-recorder-to-mp3";
 import Logo from "../components/Logo";
 import { FASTAPI_API_URL } from "../constants/api";
+import {getAccessToken} from "../components/Header";
 
 const recorder = new MicRecorder({ bitRate: 128 });
 
@@ -45,12 +46,18 @@ const VoiceTrainingPage = () => {
             return;
         }
 
+        const token = getAccessToken();
+        if (!token) return;
+
         const formData = new FormData();
         formData.append("file", audioFile);
 
         try {
             const res = await fetch(`${FASTAPI_API_URL}/voices`, {
                 method: "POST",
+                headers: {
+                    Authorization: `Bearer ${token}`
+                },
                 body: formData,
             });
             const data = await res.json();
