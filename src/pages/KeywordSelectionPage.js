@@ -112,6 +112,7 @@ const KeywordSelectionPage = () => {
     );
     
     const [guardianTitle, setGuardianTitle] = useState("");
+    const [guardianPhone, setGuardianPhone] = useState("");
 
     useEffect(() => {
         const fetchData = async () => {
@@ -125,10 +126,7 @@ const KeywordSelectionPage = () => {
                         headers: { Authorization: `Bearer ${token}` },
                     }
                 );
-                console.log("확인하기");
                 const schedules = response.data.result;
-                console.log("JSON 파싱 직전");
-                console.log(schedules);
 
                 const updatedSelected = Object.fromEntries(
                     Object.entries(keywords).map(([category, list]) => [
@@ -219,6 +217,14 @@ const KeywordSelectionPage = () => {
             });
         }
 
+        if (guardianPhone.trim() !== "") {
+            payload.push({
+                scheduleTitle : "GuardianPhone_" + guardianPhone.trim(),
+                startTime: "00:00:00",
+                days: []
+            });
+        }
+
         try {
             const response = await axios.post(
                 `${ SPRING_API_URL}/basic-schedules`,
@@ -229,7 +235,6 @@ const KeywordSelectionPage = () => {
                     },
                 }
             );
-            console.log("서버 응답:", response.data);
             navigate("/final");
         } catch (error) {
             console.error("데이터 전송 실패:", error);
@@ -246,34 +251,44 @@ const KeywordSelectionPage = () => {
             <div style={styles.leftColumn}>
                 <div style={styles.inputGroup}>
                     <label style={styles.label}>부르고 싶은 보호자의 호칭을 입력해주세요.</label>
-                <input
-                    style={styles.input}
-                    placeholder="예: 엄마, 아버지"
-                    value={guardianTitle}
-                    onChange={(e) => setGuardianTitle(e.target.value)}
-                />
-            </div>
-
-            {Object.entries(keywords).map(([category, options]) => (
-                <div key={category} style={styles.category}>
-                    <p style={styles.categoryTitle}>• {category}</p>
-                    <div style={styles.buttonContainer}>
-                        {options.map((keyword) => (
-                            <KeywordOption
-                                key={keyword}
-                                category={category}
-                                keyword={keyword}
-                                data={selected[category][keyword]}
-                                onToggle={() => toggleSelection(category, keyword)}
-                                onSave={(data) => saveTimeAndDays(category, keyword, data)}
-                            />
-                        ))}
-                    </div>
+                    <input
+                        style={styles.input}
+                        placeholder="예: 엄마, 아버지"
+                        value={guardianTitle}
+                        onChange={(e) => setGuardianTitle(e.target.value)}
+                    />
                 </div>
-            ))}
+
+                <div style={styles.inputGroup}>
+                    <label style={styles.label}>리포트를 받을 전화번호를 입력해주세요.</label>
+                    <input
+                        style={styles.input}
+                        placeholder="예: 01012345678 ('-' 제외)"
+                        value={guardianPhone}
+                        onChange={(e) => setGuardianPhone(e.target.value)}
+                    />
+                </div>
+
+                {Object.entries(keywords).map(([category, options]) => (
+                    <div key={category} style={styles.category}>
+                        <p style={styles.categoryTitle}>• {category}</p>
+                        <div style={styles.buttonContainer}>
+                            {options.map((keyword) => (
+                                <KeywordOption
+                                    key={keyword}
+                                    category={category}
+                                    keyword={keyword}
+                                    data={selected[category][keyword]}
+                                    onToggle={() => toggleSelection(category, keyword)}
+                                    onSave={(data) => saveTimeAndDays(category, keyword, data)}
+                                />
+                            ))}
+                        </div>
+                    </div>
+                ))}
             </div>
         </div>
-            <button style={styles.completeButton} onClick={handleComplete}>완료</button>
+        <button style={styles.completeButton} onClick={handleComplete}>완료</button>
         </div>
     );
 };
