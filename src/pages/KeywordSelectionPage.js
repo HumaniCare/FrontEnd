@@ -114,6 +114,9 @@ const KeywordSelectionPage = () => {
     const [guardianTitle, setGuardianTitle] = useState("");
     const [guardianPhone, setGuardianPhone] = useState("");
 
+    // ⭐ reportTime 추가
+    const [reportTime, setReportTime] = useState("08:00");
+
     useEffect(() => {
         const fetchData = async () => {
             const token = getAccessToken();
@@ -225,6 +228,15 @@ const KeywordSelectionPage = () => {
             });
         }
 
+        // ⭐ reportTime 도 추가
+        if (reportTime.trim() !== "") {
+            payload.push({
+                scheduleTitle: "ReportTime_" + reportTime.trim(),
+                startTime: reportTime + ":00",
+                days: []
+            });
+        }
+
         try {
             const response = await axios.post(
                 `${ SPRING_API_URL}/basic-schedules`,
@@ -266,6 +278,18 @@ const KeywordSelectionPage = () => {
                         placeholder="예: 01012345678 ('-' 제외)"
                         value={guardianPhone}
                         onChange={(e) => setGuardianPhone(e.target.value)}
+                    />
+                </div>
+
+                {/* ⭐ 리포트 시간 설정 추가 */}
+                <div style={styles.inputGroup}>
+                    <label style={styles.label}>매일 리포트를 받을 시간을 정해주세요.</label>
+                    <TimePicker
+                        onChange={setReportTime}
+                        value={reportTime}
+                        disableClock
+                        clearIcon={null}
+                        format="HH:mm"
                     />
                 </div>
 
@@ -347,11 +371,15 @@ const styles = {
         gap: "5px",
     },
     keywordButton: {
-        border: "2px solid black",
-        borderRadius: "20px",
-        padding: "10px 15px",
+        border: "1.5px solid #CCC",
+        borderRadius: "12px",
+        padding: "10px 18px",
         cursor: "pointer",
         fontSize: "14px",
+        backgroundColor: "#FFF",
+        color: "#333",
+        boxShadow: "0 2px 3px rgba(0,0,0,0.05)",
+        transition: "all 0.2s ease-in-out"
     },
     completeButton: {
         backgroundColor: "#DABEC9",
