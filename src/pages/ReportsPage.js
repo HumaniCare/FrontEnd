@@ -29,7 +29,7 @@ const ReportsPage = () => {
         return res.json();
       })
       .then((json) => {
-        const dto = json.data || {};
+        const dto = json.result || {};
         setReport({
           imageUrl: dto.imageUrl || null,
           report_text: dto.report_text || "",
